@@ -9,6 +9,7 @@ from plotting_utilities import figure_factory, PlotStyles
 # choose models to plot
 model_names = ["All", "EnsembleFull", "Choice1", "Choice2", "Choice3", "Choice4", "Choice5", "Choice6",
  "Choice7", "Choice8", "Choice9", "Choice10", "Choice11", "Choice12"]
+model_names = ["EnsembleFull", "Choice5", "Choice6"]
 # set titles for each plot
 titles = {"All": "All features", "EnsembleFull": "All ensemble features", "Choice1": "0, 2, 3, 4, 5",
 "Choice2": "0, 2, 3, 4, 11", "Choice3": "0, 2, 3, 4, 8",
@@ -71,3 +72,10 @@ plt.legend(loc='best', fontsize=9)
 plt.ylim(0,1)
 plt.savefig("./plots/errors_models_nn_bar.svg", format='svg')
 plt.close()
+
+print(means["val"])
+print(means["test"])
+print(means["ood"])
+print(stds["val"])
+print(stds["test"])
+print(stds["ood"])
