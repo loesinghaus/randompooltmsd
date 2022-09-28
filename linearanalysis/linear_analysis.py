@@ -1,21 +1,26 @@
-from statistics import mean
 import scipy.stats
 import scipy.optimize
 import pandas as pd
 import numpy as np
-import plotly.figure_factory as ff
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import sklearn.manifold
 import sklearn.decomposition
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-from functools import partial
+# add parent to path
+import path
+import sys
+ # directory reach
+directory = path.Path(__file__).abspath() 
+# setting path
+sys.path.append(directory.parent.parent)
+
 # local imports
-from plotting_utilities import *
-from regression_tree_utilities import y_transform
+from regressiontree.plotting_utilities import *
+from regressiontree.regression_tree_utilities import y_transform
 
 # sum of scaled tanh
 def scaled_tanh(x, *params):
@@ -24,12 +29,14 @@ def scaled_tanh(x, *params):
     b = params[no_of_features:2*no_of_features]
     S = params[2*no_of_features:3*no_of_features]
     C = params[-1]
+
+    # use sigmoid instead
     #return np.sum(S/(1+np.exp(-(a*x+b))),axis=1)
     return np.sum(S*np.tanh(a*x+b),axis=1)
 
 # read dataframe
-df = pd.read_excel("../input_data/strand_features_both_circuits.xlsx", sheet_name="EnsembleFull")
-# Define X and y (manual dropping of questions here)
+df = pd.read_excel("../input_data/strand_features_both_circuits.xlsx", sheet_name="All")
+# Define X and y (manual dropping of features here)
 X1 = df.drop("kinetics", axis=1)
 y1 = df["kinetics"]
 
@@ -42,11 +49,11 @@ X1_numpy = (X1_numpy-X1_mean)/X1_std
 y1 = np.log10(y1)
 
 # choose what to calculate
-corr_feature_feature = False
-corr_feature_kin = False
+corr_feature_feature = True
+corr_feature_kin = True
 PCA_FLAG = False
 linear_fits = False
-sigmoid_fits = True
+sigmoid_fits = False
 
 # ---------- correlation between features ----------
 if corr_feature_feature:
@@ -94,7 +101,7 @@ if corr_feature_kin:
     #correlations.sort_values(by="sq(spearman_corr)", axis=0, ascending=False, inplace=True)
 
     # set plot parameters
-    # reset params after using sns
+    # reset matplotlib params after using sns
     mpl.rcParams.update(mpl.rcParamsDefault)
 
     # plot spearman correlation
@@ -108,6 +115,7 @@ if corr_feature_kin:
     plt.savefig("./plots/correlations_qu_kin_pearson.svg")
     plt.close()
 
+    # write correlations to excel file
     correlations.to_excel("./plots/correlations_features_questions.xlsx")
 
 # ---------- t-SNE and PCA ----------
@@ -252,7 +260,7 @@ if linear_fits:
     plt.close()
 
 if sigmoid_fits:
-    #[[i for i in range(len(X1_numpy[0,:]))], [0,2,3,4,5], [0,2,3,4,11], [0,2,3,4,8], [0,2,3,4,5,8],
+    # pick tanh/sigmoid feature choices to plot
     Choices = [[0,2,4],[0,2],[2,4],[0,4],[1,2],[0],[2]]
     for choice_index, choice in enumerate(Choices):
         # ---------- fit scaled sigmoid ------------

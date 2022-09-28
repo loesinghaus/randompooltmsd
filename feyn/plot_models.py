@@ -31,23 +31,25 @@ def plot_1d_response(input_data, model, figure_name, by="", output_name="", fixe
 
     # plot
     fig = figure_factory((8,8))
+    print(by_series)
     # main plot
     ax = plt.subplot2grid(shape=(4,4),loc=(1,0),colspan=3,rowspan=3)
     ax.plot(by_series, predicted_values, color='b', linewidth=PlotStyles.linewidth, label=fixed_values_text)
     ax.scatter(by_series, y_inverse_transform(input_data[output_name]), color='grey', alpha=PlotStyles.alpha, s=PlotStyles.s, linewidths=0)
     ax.set_yscale('log')
     ax.set_ylabel(r"$\mathrm{k}_{\mathrm{eff}}$ (1/nM$\cdot$s)", labelpad=9, fontsize=9)
-    ax.set_xlabel('Free bases in toe', labelpad=9, fontsize=9)
+    #ax.set_xlabel('Free bases in toe', labelpad=9, fontsize=9)
+    ax.set_xlabel('ddG', labelpad=9, fontsize=9)
     ax.set_ylim((6E-9, 2E-3))
-    ax.set_xticks([0,5,10,15,20])
-    ax.set_xlim((-1,21))
+    #ax.set_xticks([0,5,10,15,20])
+    #ax.set_xlim((-1,21))
     ax.legend(loc='best', fontsize=7)
 
     # top histogram
     ax_top = plt.subplot2grid(shape=(4,4),loc=(0,0),colspan=3)
     ax_top.hist(by_series, color='grey', bins=np.arange(0,21,1), rwidth=0.8, alpha=0.8)
-    ax_top.set_xticks([0,5,10,15,20])
-    ax_top.set_xlim((-1,21))
+    #ax_top.set_xticks([0,5,10,15,20])
+    #ax_top.set_xlim((-1,21))
     ax_top.set_xticklabels([])
     
     # right histogram
@@ -114,7 +116,7 @@ for model in models:
 
     # plot 1D response
     # extremely dumb way to check if a parameter is in a model (there's surely a better way...)
-    possible_parameters = X_drop.drop("Free bases in toe (ensemble)", axis=1).columns
+    possible_parameters = X_drop.drop("ddG", axis=1).columns
     fixed_features = []
     for possible_parameter in possible_parameters:
         try:
@@ -124,6 +126,6 @@ for model in models:
             pass
     plot_1d_response(copy.deepcopy(input_data_full), model=loaded_model,
     figure_name=f"./plots/{sheet_name}_model{model}.svg",
-    by="Free bases in toe (ensemble)", output_name="kinetics",
+    by="ddG", output_name="kinetics",
     fixed_features=fixed_features, y_inverse_transform=y_inverse_transform)
     

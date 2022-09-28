@@ -17,10 +17,10 @@ from regression_tree_utilities import *
 
 # ---------------- Set number of different experiments ----------------
 # the name of the experiment should match a sheet name in the input file
-experiment_names = ["All", "EnsembleFull", "Ensemble", "Choice1", "Choice2",
- "Choice3", "Choice4", "Choice5", "Choice6", "Choice7", "Choice8", "Choice9", "Choice10", "Choice11"]
+experiment_names = ["EnsembleFull"]#, "Ensemble", "Choice1", "Choice2",
+ #"Choice3", "Choice4", "Choice5", "Choice6", "Choice7", "Choice8", "Choice9", "Choice10", "Choice11"]
 # input file
-input_excel_file_path = "../input_data/strand_features_circuit_one.xlsx"
+input_excel_file_path = "../input_data/strand_features_both_circuits.xlsx"
 
 # ---------------- Set parameters ----------------
 # only the x least complex trees are calculated
@@ -28,8 +28,8 @@ input_excel_file_path = "../input_data/strand_features_circuit_one.xlsx"
 alpha_start_index = 30
 
 # train test split ratio
-train_validation_test = False
-split_ratio = 0.3
+train_validation_test = True
+split_ratio = 0.4
 
 # which information should be extracted?
 # these two are costly:
@@ -51,14 +51,14 @@ sequential_drop = False
 random_choice = False 
 random_size = 5
 # exhaustive draw: Explore all possible choices of draw_size
-exhaustive_draw = False
-draw_size = 5
+exhaustive_draw = True
+draw_size = 12
 
 for experiment_name in experiment_names:
     print(f"Running experiment {experiment_name}.")
 
     # set the number of runs per experiment, their name, and the random seeds for the train/validation split
-    run_names = [f"{experiment_name}SingleR{i*11}" for i in range(1,11)]
+    run_names = [f"{experiment_name}DropOneMixedR{i*11}" for i in range(1,11)]
     random_seeds = [11*i for i in range(1,11)]
     
     for run_index, run_name in enumerate(run_names):
@@ -81,19 +81,6 @@ for experiment_name in experiment_names:
             if plot_errors:
                 Path(f"./experiments/{experiment_name}/{run_name}/errors").mkdir(parents=True, exist_ok=True) 
 
-            # create error file
-            with open(f"./experiments/{experiment_name}/{run_name}/{run_name}_best_errors.txt", 'a') as f:
-                if random_choice or exhaustive_draw:
-                    f.write(f"{X.columns}\n")
-                    f.write("index_choices,alpha_index,alpha,val_error\n")
-                elif sequential_drop:
-                    f.write("drop_index,alpha_index,alpha,val_error\n")
-                else:
-                    if train_test_split:
-                        f.write("alpha_index,alpha,val_error, test_error\n")
-                    else:
-                        f.write("alpha_index,alpha,val_error\n")
-
             # ---------------- load input data ----------------
             df = pd.read_excel(input_excel_file_path, sheet_name=sheet_name)
             # Define X and y
@@ -108,6 +95,19 @@ for experiment_name in experiment_names:
                 column_combinations = list(itertools.combinations(range(no_of_features),draw_size))
                 no_of_drops = len(column_combinations)
             
+            # create error file
+            with open(f"./experiments/{experiment_name}/{run_name}/{run_name}_best_errors.txt", 'a') as f:
+                if random_choice or exhaustive_draw:
+                    f.write(f"{X.columns}\n")
+                    f.write("index_choices,alpha_index,alpha,val_error\n")
+                elif sequential_drop:
+                    f.write("drop_index,alpha_index,alpha,val_error\n")
+                else:
+                    if train_test_split:
+                        f.write("alpha_index,alpha,val_error, test_error\n")
+                    else:
+                        f.write("alpha_index,alpha,val_error\n")
+
             # ---------------- loop over different combinations of feature choices ----------------
             for drop_index in range(no_of_drops):
                 if sequential_drop or random_choice or exhaustive_draw:
@@ -139,9 +139,11 @@ for experiment_name in experiment_names:
                     column_combination = column_combinations[drop_index]
                     drop_columns = [i for i in range(len(X.columns)) if not i in list(column_combination)]
                     X_drop = X.drop(X.columns[drop_columns], axis=1)
-                    file_prefix = f"{run_name}_{column_combination}"
+                    file_prefix = f"{run_name}_{drop_columns}"
                     # set name of excel sheet for writing errors
-                    excel_sheet_name = str(column_combination)[1:-1]
+                    # excel_sheet_name = str(column_combination)[1:-1]
+                    # use dropped column instead:
+                    excel_sheet_name = str(drop_columns)[1:-1]
                 elif sequential_drop:
                     # drop the last x features
                     X_drop = X.drop([X.columns[-curr_index] for curr_index in range(1, drop_index+1)], axis=1)
@@ -172,7 +174,10 @@ for experiment_name in experiment_names:
                 if train_validation_test:
                     pickle_inputs["X_test"] = X_test
                     pickle_inputs["y_test"] = y_test
-                pickle.dump(pickle_inputs, open(f"./experiments/{experiment_name}/{run_name}/{run_name}_inputs.p","wb"))
+                if exhaustive_draw or random_choice or sequential_drop:
+                    pickle.dump(pickle_inputs, open(f"./experiments/{experiment_name}/{run_name}/{run_name}_inputs_drop{drop_columns}.p","wb"))
+                else:
+                    pickle.dump(pickle_inputs, open(f"./experiments/{experiment_name}/{run_name}/{run_name}_inputs.p","wb"))
 
                 # train the models
                 train_errors = []
@@ -187,9 +192,9 @@ for experiment_name in experiment_names:
                 # only use the last x values for actual trees
                 ccp_alphas = ccp_alphas[-alpha_start_index:]
                 # initialize numpy arrays for storing tree properties
-                column_occurences = np.zeros((len(ccp_alphas),len(X.columns)))
+                column_occurences = np.zeros((len(ccp_alphas),len(X_drop.columns)))
                 leaf_numbers = np.zeros(len(ccp_alphas))
-                importance_scores = np.zeros((len(ccp_alphas), len(X.columns)))
+                importance_scores = np.zeros((len(ccp_alphas), len(X_drop.columns)))
 
                 print(f"number of alphas used: {len(ccp_alphas)}")
                 for index, ccp_alpha in enumerate(ccp_alphas):
@@ -290,7 +295,7 @@ for experiment_name in experiment_names:
                 best_errors["val_error"] = np.array(val_errors)
                 if train_validation_test:
                     best_errors["test_error"] = np.array(test_errors)
-                importance_df = pd.DataFrame(data=importance_scores, columns=X.columns)
+                importance_df = pd.DataFrame(data=importance_scores, columns=X_drop.columns)
                 # column_count = pd.DataFrame(data=column_occurences, columns=X_drop.columns)
                 errors_and_column_count = pd.concat([best_errors, importance_df], axis=1)
 
@@ -310,7 +315,7 @@ for experiment_name in experiment_names:
                         chosen_indices = [i for i in range(len(X.columns)) if not i in list(drop_numbers)]
                         f.write(f"{chosen_indices},{best_error_index},{ccp_alphas[best_error_index]},{errors[best_error_index]}\n")
                     elif exhaustive_draw:
-                        f.write(f"{column_combination},{best_error_index},{ccp_alphas[best_error_index]},{errors[best_error_index]}\n")
+                        f.write(f"{drop_columns},{best_error_index},{ccp_alphas[best_error_index]},{errors[best_error_index]}\n")
                     elif sequential_drop:
                         f.write(f"{drop_index},{best_error_index},{ccp_alphas[best_error_index]},{errors[best_error_index]}\n")
                     else:
