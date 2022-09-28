@@ -35,7 +35,7 @@ def scaled_tanh(x, *params):
     return np.sum(S*np.tanh(a*x+b),axis=1)
 
 # read dataframe
-df = pd.read_excel("../input_data/strand_features_both_circuits.xlsx", sheet_name="All")
+df = pd.read_excel("../input_data/strand_features_both_circuits.xlsx", sheet_name="EnsembleFull")
 # Define X and y (manual dropping of features here)
 X1 = df.drop("kinetics", axis=1)
 y1 = df["kinetics"]
@@ -49,10 +49,15 @@ X1_numpy = (X1_numpy-X1_mean)/X1_std
 y1 = np.log10(y1)
 
 # choose what to calculate
-corr_feature_feature = True
-corr_feature_kin = True
-PCA_FLAG = False
-linear_fits = False
+# should be run separately
+corr_feature_feature = False
+corr_feature_kin = False
+
+# should be run separately
+PCA_FLAG = True
+linear_fits = True
+
+# should be run separately
 sigmoid_fits = False
 
 # ---------- correlation between features ----------
@@ -213,8 +218,8 @@ if PCA_FLAG:
 
 # ---------- linear regression ------------
 if linear_fits:    
-    # pick components for the fit
-    X1_numpy = X1_numpy[:,[0,2,4]]
+    # pick components for the fit (first component is the data, second the features)
+    X1_numpy = X1_numpy[:,[0,2]]
     y_fitting, y_inverse_transform, _, _ = y_transform(np.power(10, y1))
     X_train, X_val, y_train, y_val = train_test_split(X1_numpy,y_fitting,test_size=0.4,random_state=11)
     reg = LinearRegression().fit(X_train, y_train)

@@ -73,7 +73,8 @@ def analyze_tree(my_tree: DecisionTreeRegressor, features: list[str]) -> tuple[i
     return leaves, occurrences
 
 def visualize_tree(my_tree: DecisionTreeRegressor, columns: list[str], y_inversion_func) -> str:
-    """Exports a graphviz dot file of a regression tree for visualization."""
+    """Exports a graphviz dot file of a regression tree for visualization.
+    Regular expressions are used to remove unwanted information for nicer plots."""
     text = export_graphviz(my_tree, out_file=None, feature_names=columns)
 
     # delete n samples and squared error

@@ -7,8 +7,6 @@ from sklearn.metrics import mean_squared_error
 from sklearn.tree import plot_tree
 from pathlib import Path
 import itertools
-from distutils.dir_util import copy_tree
-from distutils.file_util import copy_file
 
 # import from local utilities
 from plotting_utilities import figure_factory, PlotStyles, sort_kinetics
@@ -38,8 +36,6 @@ plot_fit = False
 # these are not:
 plot_errors = True
 pickle_tree = True
-# DEPRECATED, DO NOT CHANGE
-copy_data_to_eval = False
 
 # ------------ run mode -------------
 # Here, one can run feature selection in different modes
@@ -115,7 +111,7 @@ for experiment_name in experiment_names:
 
                 # drop columns from X if appropriate
                 if random_choice:
-                     # if random choice mode is active, try to find a a new combination in less than 1000 tries
+                    # if random choice mode is active, try to find a a new combination in less than 1000 tries
                     # if no new combination is found, stop the run
                     counter = 0
                     while(True):
@@ -324,14 +320,6 @@ for experiment_name in experiment_names:
                                 f"{errors[best_error_index]},{test_errors[best_error_index]}\n")
                         else:
                             f.write(f"{best_error_index},{ccp_alphas[best_error_index]},{errors[best_error_index]}\n")
-            # copy data and appropriate trees to a different folder for evaluation
-            # DEPRECATED
-            """
-            if copy_data_to_eval:
-                copy_tree(src=f"./experiments/{experiment_name}/{run_name}",dst=f"./tree_eval/{experiment_name}/{run_name}")
-                for index in [5,10,15]:
-                    copy_file(src=f"./experiments/{experiment_name}/{run_name}/trees_pickle/{run_name}_alpha_{index}.p",
-                    dst="./tree_eval")"""
         except StopIteration:
             # This exists for when no new combination is found in a random choice experiment.
             print("Iteration stopped because no new combination of column choices was found.")
