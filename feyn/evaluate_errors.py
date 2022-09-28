@@ -1,8 +1,17 @@
 import feyn
 import pandas as pd
-from plotting_utilities import figure_factory, sort_kinetics, PlotStyles
 import numpy as np
 import matplotlib.pyplot as plt
+# add parent to path
+import path
+import sys
+ # directory reach
+directory = path.Path(__file__).abspath() 
+# setting path
+sys.path.append(directory.parent.parent)
+
+# local imports
+from regressiontree.plotting_utilities import *
 
 # models to evaluate
 model_names = ["EnsembleFull", "Choice5", "Choice6"]
@@ -20,7 +29,6 @@ for key, entry in enumerate(titles):
 
 # set random states
 random_states = [10*i for i in np.arange(1,11)]
-#random_states = [10,20]
 
 train_errors = {model_name: np.zeros(len(random_states)) for model_name in model_names}
 val_errors = {model_name: np.zeros(len(random_states)) for model_name in model_names}
@@ -39,7 +47,6 @@ for model_name in model_names:
                 if float(line[2])+float(line[1]) < minimum_error:
                     minimum_error = float(line[2])+float(line[1])
                     min_error_line = line
-            #min_error_line = f.readline().split(',')
             train_errors[model_name][random_index] = min_error_line[1]
             val_errors[model_name][random_index] = min_error_line[2]
             test_errors[model_name][random_index] = min_error_line[3]
@@ -63,7 +70,8 @@ plot_params = {"use_params": True, "ylabel": "mean squared error", "xlabel": "mo
 fig = figure_factory(figsize=(5,6), **plot_params)
 
 # convert the model index to a letter
-model_indices = ["B", "G", "H"] #list(chr(i+65) for i in np.arange(0,len(model_names)))
+#list(chr(i+65) for i in np.arange(0,len(model_names)))
+model_indices = ["B", "G", "H"]
 xvals = np.arange(0, 2.25*len(model_names),2.25)
 plt.xticks(xvals, model_indices)
 
@@ -89,9 +97,9 @@ plt.ylim(0,1)
 plt.savefig("./plots/errors_models_feyn_bar.svg", format='svg')
 plt.close()
 
-print(means["val"])
+"""print(means["val"])
 print(means["test"])
 print(means["ood"])
 print(stds["val"])
 print(stds["test"])
-print(stds["ood"])
+print(stds["ood"])"""

@@ -10,13 +10,14 @@ importance_scores_all = []
 for run_name in run_names:
     usage_df = pd.read_excel(f"./experiments/TotalAlpha/EnsembleFull/{run_name}/{run_name}_errors_importance.xlsx", sheet_name=run_name)
     
-    # rename columns:
+    # rename columns
+    # remove the (ensemble) part of feature names:
     if replace_ensemble:
         replacement_dict = {column: f'{index}: {column.replace(" (ensemble)","")}' for index, column in enumerate(usage_df.columns[4:])}
     else:
         replacement_dict = {column: f'{index}: {column}' for index, column in enumerate(usage_df.columns[5:])}
     usage_df = usage_df.rename(columns=replacement_dict)
-    # choose the feature columns
+    # use only the feature columns
     feature_columns = usage_df.columns[5:]
     # extract importance scores
     importance_scores = pd.Series(0, feature_columns)

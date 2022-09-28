@@ -2,16 +2,14 @@ import pickle
 from sklearn.tree import DecisionTreeRegressor
 import pandas as pd
 import numpy as np
-from functools import partial
 import scipy.stats
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 from plotting_utilities import PlotStyles, cm2inch, sort_kinetics
-from regression_tree_utilities import y_transform, y_transform_fixed
+from regression_tree_utilities import y_transform_fixed
 
 # the script plots either the train/val/test set or out-of-distribution data
-plot_train_val_test = False
+plot_train_val_test = True
 
 # Choose which models to plot
 #model_names = ["All", "EnsembleFull", "Choice1", "Choice2", "Choice3", "Choice4", "Choice5", "Choice6",
@@ -34,7 +32,7 @@ plt.yscale('log')
 
 # loop over models for one specific random seed
 for model_index, model_name in enumerate(model_names):
-    run_names = [f"{model_name}MixedR{i*11}" for i in range(1,11)]
+    # set the random seed to be used
     RX = "R33"
     run_name = f"{model_name}Mixed{RX}"
 
@@ -129,6 +127,7 @@ for model_index, model_name in enumerate(model_names):
         ax.plot(x_vals_ood, sorted_y_ood, linewidth=size_params["lw"], color='k', label=f"out-of-distribution data, mse={ood_error:.2f}")
 
     ax.legend(loc='lower right', fontsize=8)
+    # set x and y axis location
     if model_index%2 == 0:
         ax.set_ylabel(r"$\mathrm{k}_{\mathrm{eff}}$ (1/nM$\cdot$s)", fontsize=9, labelpad = 9)
     if int(model_index/2.0) == int(len(model_names)/2-1):

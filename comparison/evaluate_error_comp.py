@@ -1,7 +1,15 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from feyn.plotting_utilities import figure_factory
+# add parent to path
+import path
+import sys
+ # directory reach
+directory = path.Path(__file__).abspath() 
+# setting path
+sys.path.append(directory.parent.parent)
+# local imports
+from regressiontree.plotting_utilities import *
 
 error_data = pd.read_excel("error_comp.xlsx", sheet_name="AllErrors")
 

@@ -1,13 +1,22 @@
 import feyn
 import pandas as pd
-from regression_tree_utilities import y_transform_fixed
-from regression_tree_utilities import y_transform
-from plotting_utilities import figure_factory, sort_kinetics, PlotStyles
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
+# add parent to path
+import path
+import sys
+ # directory reach
+directory = path.Path(__file__).abspath() 
+# setting path
+sys.path.append(directory.parent.parent)
+
+# local imports
+from regressiontree.plotting_utilities import *
+from regressiontree.regression_tree_utilities import y_transform, y_transform_fixed
+
 
 def extract_parameters(model, possible_parameters):
     outputs = []

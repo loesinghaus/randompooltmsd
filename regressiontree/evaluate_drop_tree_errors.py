@@ -68,14 +68,11 @@ for model_index, model_name in enumerate(model_names):
         y_ood_inv = y_ood
         y_ood = y_transform_fixed(y_ood, transform_mean, transform_std)
 
-        # calculate errors and the spearman correlation
+        # calculate errors
         val_error = mean_squared_error(y_val, my_model.predict(X_val))
-        #val_spearman,_ = scipy.stats.spearmanr(y_val, my_model.predict(X_val)) 
         ood_error = mean_squared_error(y_ood, my_model.predict(X_ood))
-        #ood_spearman,_ = scipy.stats.spearmanr(y_ood, my_model.predict(X_ood))
         test_error = mean_squared_error(y_test, my_model.predict(X_test))
-        #test_spearman,_ = scipy.stats.spearmanr(y_test, my_model.predict(X_test))
-
+        
         val_errors.append(val_error)
         test_errors.append(test_error)
         ood_errors.append(ood_error)
@@ -87,7 +84,7 @@ for model_index, model_name in enumerate(model_names):
     test_errors = np.array(test_errors)
     ood_errors = np.array(ood_errors)
 
-    # calculate means and standard deviations of the mean
+    # calculate means and standard deviations of the means
     errors_mean_val[model_index] = np.mean(val_errors)
     errors_std_val[model_index] = np.std(val_errors)/np.sqrt(len(run_names))
     errors_mean_test[model_index] = np.mean(test_errors)

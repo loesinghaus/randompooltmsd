@@ -2,9 +2,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-import scipy.stats
 # import from local utilities
 from plotting_utilities import figure_factory, PlotStyles
 from regression_tree_utilities import y_transform_fixed
@@ -12,7 +10,7 @@ from regression_tree_utilities import y_transform_fixed
 # choose models to plot
 model_names = ["All", "EnsembleFull", "Choice1", "Choice2", "Choice3", "Choice4", "Choice5", "Choice6",
  "Choice7", "Choice8", "Choice9", "Choice10", "Choice11"]
-model_names = ["EnsembleFull", "Choice5", "Choice6"]
+#model_names = ["EnsembleFull", "Choice5", "Choice6"]
 # set titles for each plot
 titles = {"All": "All features", "EnsembleFull": "All ensemble features", "Choice1": "0, 2, 3, 4, 5",
 "Choice2": "0, 2, 3, 4, 11", "Choice3": "0, 2, 3, 4, 8",
@@ -72,13 +70,10 @@ for model_index, model_name in enumerate(model_names):
         y_ood_inv = y_ood
         y_ood = y_transform_fixed(y_ood, transform_mean, transform_std)
 
-        # calculate errors and the spearman correlation
+        # calculate errors
         val_error = mean_squared_error(y_val, my_model.predict(X_val))
-        #val_spearman,_ = scipy.stats.spearmanr(y_val, my_model.predict(X_val)) 
         ood_error = mean_squared_error(y_ood, my_model.predict(X_ood))
-        #ood_spearman,_ = scipy.stats.spearmanr(y_ood, my_model.predict(X_ood))
         test_error = mean_squared_error(y_test, my_model.predict(X_test))
-        #test_spearman,_ = scipy.stats.spearmanr(y_test, my_model.predict(X_test))
 
         val_errors.append(val_error)
         test_errors.append(test_error)
@@ -91,7 +86,7 @@ for model_index, model_name in enumerate(model_names):
     test_errors = np.array(test_errors)
     ood_errors = np.array(ood_errors)
 
-    # calculate means and standard deviations of the mean
+    # calculate means and standard deviations of the means
     errors_mean_val[model_index] = np.mean(val_errors)
     errors_std_val[model_index] = np.std(val_errors)/np.sqrt(len(run_names))
     errors_mean_test[model_index] = np.mean(test_errors)
@@ -127,9 +122,9 @@ plt.ylim(0,1)
 plt.savefig("./plots/errors_models_mixed_bar.svg", format='svg')
 plt.close()
 
-print(errors_mean_val)
+"""print(errors_mean_val)
 print(errors_mean_test)
 print(errors_mean_ood)
 print(errors_std_val)
 print(errors_std_test)
-print(errors_std_ood)
+print(errors_std_ood)"""

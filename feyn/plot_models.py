@@ -1,18 +1,35 @@
 import json
 from sklearn.model_selection import train_test_split
-from plotting_utilities import figure_factory
-from regression_tree_utilities import y_transform_fixed
-from regression_tree_utilities import y_transform
 import pandas as pd
 import numpy as np
 import feyn
 import matplotlib.pyplot as plt
-from plotting_utilities import cm2inch, PlotStyles
-import matplotlib.gridspec as gridspec
 import copy
 import sympy
+# add parent to path
+import path
+import sys
+ # directory reach
+directory = path.Path(__file__).abspath() 
+# setting path
+sys.path.append(directory.parent.parent)
+
+# local imports
+from regressiontree.plotting_utilities import *
+from regressiontree.regression_tree_utilities import y_transform, y_transform_fixed
+
 
 def plot_1d_response(input_data, model, figure_name, by="", output_name="", fixed_features=[""], y_inverse_transform=None):
+    """Plots the 1D response of a Feyn model.
+    
+    Keyword arguments:
+    input_data -- Pandas DataFrame containing the input data.
+    model -- A Feyn model.
+    by -- Name of the column which is used for the x-Axis.
+    output_name -- Name of the predicted value (e.g., kinetics).
+    fixed_features -- Complete list of all features that are held fixed.
+    y_inverse_transform -- Transform from logarithmic kinetics to True kinetics."""
+    
     # sort input data
     input_data.sort_values(by=by, inplace=True)
 
@@ -31,25 +48,24 @@ def plot_1d_response(input_data, model, figure_name, by="", output_name="", fixe
 
     # plot
     fig = figure_factory((8,8))
-    print(by_series)
     # main plot
     ax = plt.subplot2grid(shape=(4,4),loc=(1,0),colspan=3,rowspan=3)
     ax.plot(by_series, predicted_values, color='b', linewidth=PlotStyles.linewidth, label=fixed_values_text)
     ax.scatter(by_series, y_inverse_transform(input_data[output_name]), color='grey', alpha=PlotStyles.alpha, s=PlotStyles.s, linewidths=0)
     ax.set_yscale('log')
     ax.set_ylabel(r"$\mathrm{k}_{\mathrm{eff}}$ (1/nM$\cdot$s)", labelpad=9, fontsize=9)
-    #ax.set_xlabel('Free bases in toe', labelpad=9, fontsize=9)
-    ax.set_xlabel('ddG', labelpad=9, fontsize=9)
+    ax.set_xlabel('Free bases in toe', labelpad=9, fontsize=9)
+    #ax.set_xlabel('ddG', labelpad=9, fontsize=9)
     ax.set_ylim((6E-9, 2E-3))
-    #ax.set_xticks([0,5,10,15,20])
-    #ax.set_xlim((-1,21))
+    ax.set_xticks([0,5,10,15,20])
+    ax.set_xlim((-1,21))
     ax.legend(loc='best', fontsize=7)
 
     # top histogram
     ax_top = plt.subplot2grid(shape=(4,4),loc=(0,0),colspan=3)
     ax_top.hist(by_series, color='grey', bins=np.arange(0,21,1), rwidth=0.8, alpha=0.8)
-    #ax_top.set_xticks([0,5,10,15,20])
-    #ax_top.set_xlim((-1,21))
+    ax_top.set_xticks([0,5,10,15,20])
+    ax_top.set_xlim((-1,21))
     ax_top.set_xticklabels([])
     
     # right histogram
@@ -81,8 +97,6 @@ y, y_inverse_transform, transform_mean, transform_std = y_transform(y)
 # merge dataframe again
 input_data_full = X_drop.assign(kinetics=y)
 
-print(transform_mean)
-print(transform_std)
 # ---------------- load ood data ----------------
 input_excel_file_path = "../input_data/strand_features_N50.xlsx"
 
@@ -107,6 +121,7 @@ input_data_train = X_train.assign(kinetics=y_train)
 input_data_val = X_val.assign(kinetics=y_val)
 
 for model in models:
+    # load feyn model
     loaded_model = feyn.Model.load(f"{root_directory}/model{model}/model{model}.json")
     loaded_model.plot_signal(input_data_full, filename=f"./plots/model{model}_signal.html")
 
@@ -116,7 +131,8 @@ for model in models:
 
     # plot 1D response
     # extremely dumb way to check if a parameter is in a model (there's surely a better way...)
-    possible_parameters = X_drop.drop("ddG", axis=1).columns
+    oneD_feature = "Free bases in toe (ensemble)"
+    possible_parameters = X_drop.drop(oneD_feature, axis=1).columns
     fixed_features = []
     for possible_parameter in possible_parameters:
         try:
@@ -126,6 +142,6 @@ for model in models:
             pass
     plot_1d_response(copy.deepcopy(input_data_full), model=loaded_model,
     figure_name=f"./plots/{sheet_name}_model{model}.svg",
-    by="ddG", output_name="kinetics",
+    by=oneD_feature, output_name="kinetics",
     fixed_features=fixed_features, y_inverse_transform=y_inverse_transform)
     
