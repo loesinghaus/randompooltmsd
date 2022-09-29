@@ -1,14 +1,12 @@
 import pandas as pd
 import numpy as np
-import pickle
 import matplotlib.pyplot as plt
-import scipy.stats
 # import from local utilities
 from plotting_utilities import figure_factory, PlotStyles
 
 # choose models to plot
 model_names = ["All", "EnsembleFull", "Choice1", "Choice2", "Choice3", "Choice4", "Choice5", "Choice6",
- "Choice7", "Choice8", "Choice9", "Choice10", "Choice11", "Choice12"]
+ "Choice7", "Choice8", "Choice9", "Choice10", "Choice11"]
 model_names = ["EnsembleFull", "Choice5", "Choice6"]
 # set titles for each plot
 titles = {"All": "All features", "EnsembleFull": "All ensemble features", "Choice1": "0, 2, 3, 4, 5",

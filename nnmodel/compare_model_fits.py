@@ -6,10 +6,8 @@ import matplotlib.pyplot as plt
 from plotting_utilities import cm2inch, PlotStyles
 
 # choose models to plot
-#model_names = ["All", "EnsembleFull", "Choice1", "Choice2", "Choice3", "Choice4", "Choice5", "Choice6",
-# "Choice7", "Choice8", "Choice9", "Choice10", "Choice11"]
 #model_names = ["EnsembleFull", "Choice5", "Choice6", "Choice8", "Choice11", "Choice12"]
-model_names = ["EnsembleFull", "Choice5", "Choice6", "Choice11"]
+model_names = ["EnsembleFull", "Choice1", "Choice5", "Choice6", "Choice8", "Choice11"]
 # set titles for each plot
 titles = {"All": "A: All features", "EnsembleFull": "B: All ensemble features", "Choice1": "C: 0, 2, 3, 4, 5",
 "Choice2": "D: 0, 2, 3, 4, 11", "Choice3": "E: 0, 2, 3, 4, 8",
@@ -18,12 +16,12 @@ titles = {"All": "A: All features", "EnsembleFull": "B: All ensemble features", 
 "Choice9": "K: 1, 2", "Choice10": "L: 0", "Choice11": "M: 2", "Choice12": "N: 0, 1, 2, 4"}
 
 # set plot parameters
-plot_train_val_test = True
-RX = "R33"
+plot_train_val_test = False
+RX = "R30"
 plt.rcParams.update(PlotStyles.font)
 # 16, 14 for 6 plots
 # 16, 10 for 4 plots
-fig, axs = plt.subplots(2,2,sharex=True,sharey=True, figsize = cm2inch(16,10))
+fig, axs = plt.subplots(3,2,sharex=True,sharey=True, figsize = cm2inch(16,14))
 plt.yscale('log')
 
 # loop over models for one specific random seed
@@ -31,7 +29,7 @@ for model_index, model_name in enumerate(model_names):
     run_name = f"{model_name}Mixed{RX}"
 
     # -----------  read data ----------- :
-    sorted_pairs = pickle.load(open(f"./experiments/{model_name}/{run_name}/{run_name}_sorted_pairs", 'rb'))
+    sorted_pairs = pickle.load(open(f"./experiments/{model_name}/{run_name}/{run_name}_p0.25_sorted_pairs", 'rb'))
     # read errors
     with open(f"./errors/errors_{model_name}.txt", 'r') as f:
         f.readline()

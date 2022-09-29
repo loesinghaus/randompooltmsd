@@ -103,6 +103,44 @@ The outputs are:
 ## nn model
 This package generates and evaluates fully connected neural network models for the data.
 
+### MLP_model.py
+Contains the actual model definition. The loss function is mean squared error, the activation function is ReLU.
+
+### kinetics_dataset.py
+Loads the dataset. Can either be called using the "ood" mode, in which case a mean and std value needs to be supplied for the fixed transform, or using the "test", "val", or "test" modes, in which case a train/val/test split is introduced to the data. The dataset samples contain "features" and "kinetics" values.
+
+### training.py
+This script runs the actual training.
+- **experiment_names** defines the feature subsets.
+- Normalization can be beformed using different weight decay values or dropout values (chosen by the **weight_decay_FLAG**).
+- **run_names** and **random_seeds** should be chosen to be compatible.
+
+For each random seed, the following outputs are produced:
+- **{run_name}_train/ood.svg** shows the actual fits.
+- **{run_name}_errors.txt** contains the errors for each dropout/weight_decay value)
+- **{run_name}_sorted_pairs** is a pickle file containing pairs of original y values and predictions with indices 0:test, 1:val, 2:test, 3:ood.
+- **errors_{experiment_name}** in the folder **errors** contains the best errors for a given set of weight decay or dropout values.
+
+### evaluate_single_model.py
+Contains a helper function that creates a fit figure for a given model (provided either as an object or as a string path to the checkpoint) and a given set of dataloaders.
+
+### evaluate_errors.py
+Plots a bar graph of the errors in the **errors** folder for different choices of feature subsets.
+- **model_names** sets the used feature subsets.
+- **no_of_runs** sets the number of random seeds.
+
+### evaluate_errors_normalization.py
+Plots errors for different weight decay or dropout values averaged over different random seeds.
+- **no_of_weights** sets the number of different weight decay/dropout values
+- **no_of_runs** sets the number of random seeds
+- **weight_decay_FLAG** determines whether weight decay or dropout is used for plotting
+
+### compare_model_fits.py
+Plots the fit for a specific random seed for a set of feature subsets.
+- **model_names** sets which models are plotted. The number of subplots in "set plot parameters" should fit. "set x and y axis location" also needs to be adjusted individually.
+- **RX** determines which random seed is used for plotting.
+- **plot_train_val_test** determines whether train/val/test or ood data is plotted.
+
 ## comparison
 This script plots a graph that compares the validation, test, and ood error for the different model types (regression tree, feyn, neural network)
 - **evaluate_error_comp.py** plots a bar graph of the errors.
