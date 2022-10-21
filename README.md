@@ -1,5 +1,5 @@
 # randompooltmsd
-- Code for creating decision trees, neural nets, and Feyn models based on features of interfering strands
+- Code for creating decision trees, neural nets, and Feyn models based on features of interfering strands as well as the code for NUPACK analysis and feature extraction.
 - sequences and measurement data (normalized median of triplets)
 
 ## general info
