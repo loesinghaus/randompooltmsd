@@ -9,7 +9,7 @@ The **plots** folder generally contains all generated plots.
 The **experiments** or **models** folder is where the results of individual runs are saved.
 The **sequences** folder contains the important/known sequences used.
 The **measurement** folder contains the normalized data of triplet measurements.
-The **NUPACK and feature extraction** folder contains the code for the used NUPACK analysis and feature extraction.
+The **NUPACK analysis and feature extraction** folder contains the code for the used NUPACK analysis and feature extraction.
 
 ## linear analysis
 This package contains all linear evaluations of the features (e.g., correlations).
