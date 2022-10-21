@@ -1,11 +1,15 @@
 # randompooltmsd
-Code for creating decision trees, neural nets, and Feyn models based on features of interfering strands
+- Code for creating decision trees, neural nets, and Feyn models based on features of interfering strands
+- sequences and measurement data (normalized median of triplets)
 
 ## general info
 The folder input_data contains excel files for the different types of training data. Within each excel files, each individual choice of features is given its own sheet. Within scripts, the choice of input features can be changed by altering the **sheet_name** parameter in the pandas import.
 Plotting styles are partially set in each individual script file and partially in regressiontree.plot_utilities.
 The **plots** folder generally contains all generated plots.
 The **experiments** or **models** folder is where the results of individual runs are saved.
+The **sequences** folder contains the important/known sequences used.
+The **measurement** folder contains the normalized data of triplet measurements.
+The **NUPACK and feature extraction** folder contains the code for the used NUPACK analysis and feature extraction.
 
 ## linear analysis
 This package contains all linear evaluations of the features (e.g., correlations).
